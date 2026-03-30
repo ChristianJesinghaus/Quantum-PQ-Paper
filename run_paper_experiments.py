@@ -428,6 +428,31 @@ PLANS: Dict[str, Dict[str, Any]] = {
             },
         ],
     },
+
+    "ablate_metric_digits_omf_fix": {
+        "dataset_file": "digits64_full.npz",
+        "test_size": 300,
+        "train_sizes": [300],
+        "seeds": [0, 1, 2],
+        "normalize_data": True,
+        "k": 9,
+        "n": 8,
+        "c": 10,
+        "variants": [
+            {
+                "name": "quantum_exact_omf",
+                "algorithm": "quantum",
+                "distance_metric": "one_minus_fidelity",
+                "fidelity_mode": "exact",
+                "quantum_shots": 2000,
+                "max_iter_qk": 100,
+                "qk_tolerance": 1e-2,
+                "smooth_eps": 1e-3,
+                "sign_aware_encoding": False,
+            },
+        ],
+    },
+
     "ablate_signaware_synth": {
         "dataset_file": "signed_mirror64_full.npz",
         "test_size": 500,

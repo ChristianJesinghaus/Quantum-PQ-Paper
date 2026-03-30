@@ -105,7 +105,7 @@ def plot_line_over_train_size(df: pd.DataFrame, metric: str, title: str, out_pat
         return
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.figure(figsize=(8, 5))
+    plt.figure(figsize=(7.2, 4.6))
     for variant in ordered_variants_present(df, MAIN_VARIANT_ORDER):
         sub = df[df["variant_name"] == variant].sort_values("train_size")
         plt.errorbar(
@@ -113,15 +113,19 @@ def plot_line_over_train_size(df: pd.DataFrame, metric: str, title: str, out_pat
             sub[mean_col],
             yerr=_get_yerr(sub, std_col),
             marker="o",
+            markersize=5.5,
+            linewidth=2.0,
+            elinewidth=1.1,
             capsize=3,
             label=str(variant),
         )
-    plt.xlabel("Train size M")
-    plt.ylabel(metric)
-    plt.title(title)
-    plt.legend()
+    plt.xlabel("Train size $M$", fontsize=11)
+    plt.ylabel(metric.replace("_", " "), fontsize=11)
+    plt.xticks(fontsize=9)
+    plt.yticks(fontsize=9)
+    plt.legend(fontsize=8, frameon=False)
     plt.tight_layout()
-    plt.savefig(out_path, dpi=200)
+    plt.savefig(out_path, dpi=220, bbox_inches="tight")
     plt.close()
 
 
@@ -134,13 +138,20 @@ def plot_bar(df: pd.DataFrame, metric: str, title: str, out_path: Path) -> None:
     sub = df.sort_values("variant_name")
     x = np.arange(len(sub))
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.figure(figsize=(8, 5))
-    plt.bar(x, sub[mean_col], yerr=_get_yerr(sub, std_col), capsize=4)
-    plt.xticks(x, sub["variant_name"], rotation=25, ha="right")
-    plt.ylabel(metric)
-    plt.title(title)
+    plt.figure(figsize=(7.2, 4.6))
+    plt.bar(
+        x,
+        sub[mean_col],
+        yerr=_get_yerr(sub, std_col),
+        capsize=4,
+        edgecolor="black",
+        linewidth=0.8,
+    )
+    plt.xticks(x, sub["variant_name"], rotation=20, ha="right", fontsize=9)
+    plt.yticks(fontsize=9)
+    plt.ylabel(metric.replace("_", " "), fontsize=11)
     plt.tight_layout()
-    plt.savefig(out_path, dpi=200)
+    plt.savefig(out_path, dpi=220, bbox_inches="tight")
     plt.close()
 
 
@@ -151,7 +162,7 @@ def plot_tolerance_lines(df: pd.DataFrame, metric: str, title: str, out_path: Pa
         return
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.figure(figsize=(8, 5))
+    plt.figure(figsize=(7.2, 4.6))
     for shots in sorted([s for s in df["quantum_shots"].dropna().unique()]):
         sub = df[df["quantum_shots"] == shots].sort_values("qk_tolerance")
         plt.errorbar(
@@ -159,16 +170,20 @@ def plot_tolerance_lines(df: pd.DataFrame, metric: str, title: str, out_path: Pa
             sub[mean_col],
             yerr=_get_yerr(sub, std_col),
             marker="o",
+            markersize=5.5,
+            linewidth=2.0,
+            elinewidth=1.1,
             capsize=3,
             label=f"shots={int(shots)}",
         )
     plt.xscale("log")
-    plt.xlabel("qk_tolerance")
-    plt.ylabel(metric)
-    plt.title(title)
-    plt.legend()
+    plt.xlabel(r"Tolerance $\tau$", fontsize=11)
+    plt.ylabel(metric.replace("_", " "), fontsize=11)
+    plt.xticks(fontsize=9)
+    plt.yticks(fontsize=9)
+    plt.legend(fontsize=8, frameon=False)
     plt.tight_layout()
-    plt.savefig(out_path, dpi=200)
+    plt.savefig(out_path, dpi=220, bbox_inches="tight")
     plt.close()
 
 
@@ -179,14 +194,14 @@ def plot_shots_lines(df: pd.DataFrame, metric: str, title: str, out_path: Path) 
         return
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.figure(figsize=(8, 5))
+    plt.figure(figsize=(7.2, 4.6))
 
     exact = df[df["variant_name"] == "quantum_exact"]
     shot = df[df["variant_name"] != "quantum_exact"].sort_values("quantum_shots")
 
     if not exact.empty:
         y = float(exact.iloc[0][mean_col])
-        plt.axhline(y=y, linestyle="--", label="quantum_exact")
+        plt.axhline(y=y, linestyle="--", linewidth=1.6, label="quantum_exact")
 
     if not shot.empty and "quantum_shots" in shot.columns:
         plt.errorbar(
@@ -194,15 +209,19 @@ def plot_shots_lines(df: pd.DataFrame, metric: str, title: str, out_path: Path) 
             shot[mean_col],
             yerr=_get_yerr(shot, std_col),
             marker="o",
+            markersize=5.5,
+            linewidth=2.0,
+            elinewidth=1.1,
             capsize=3,
             label="quantum_shot",
         )
-    plt.xlabel("Shots")
-    plt.ylabel(metric)
-    plt.title(title)
-    plt.legend()
+    plt.xlabel("Shots", fontsize=11)
+    plt.ylabel(metric.replace("_", " "), fontsize=11)
+    plt.xticks(fontsize=9)
+    plt.yticks(fontsize=9)
+    plt.legend(fontsize=8, frameon=False)
     plt.tight_layout()
-    plt.savefig(out_path, dpi=200)
+    plt.savefig(out_path, dpi=220, bbox_inches="tight")
     plt.close()
 
 
@@ -213,7 +232,7 @@ def plot_tolerance_size_variation(df: pd.DataFrame, metric: str, title: str, out
         return
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.figure(figsize=(8, 5))
+    plt.figure(figsize=(7.2, 4.6))
     for variant, sub in df.groupby("variant_name"):
         sub = sub.sort_values("train_size")
         plt.errorbar(
@@ -221,15 +240,19 @@ def plot_tolerance_size_variation(df: pd.DataFrame, metric: str, title: str, out
             sub[mean_col],
             yerr=_get_yerr(sub, std_col),
             marker="o",
+            markersize=5.5,
+            linewidth=2.0,
+            elinewidth=1.1,
             capsize=3,
             label=str(variant),
         )
-    plt.xlabel("Train size M")
-    plt.ylabel(metric)
-    plt.title(title)
-    plt.legend()
+    plt.xlabel("Train size $M$", fontsize=11)
+    plt.ylabel(metric.replace("_", " "), fontsize=11)
+    plt.xticks(fontsize=9)
+    plt.yticks(fontsize=9)
+    plt.legend(fontsize=8, frameon=False)
     plt.tight_layout()
-    plt.savefig(out_path, dpi=200)
+    plt.savefig(out_path, dpi=220, bbox_inches="tight")
     plt.close()
 
 

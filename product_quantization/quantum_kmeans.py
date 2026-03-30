@@ -187,6 +187,22 @@ class QuantumKMeans:
         s = np.clip(s, 0.0, 1.0)
         return float(np.sum(np.log((1.0 + eps) / (s + eps))))
 
+    @staticmethod
+    def _cluster_one_minus_fid_loss(pts: np.ndarray, c: np.ndarray) -> float:
+        """
+        Cluster loss for one_minus_fidelity:
+
+            sum_i (1 - |<u_i, c>|^2)
+
+        Here pts are already the normalized block states used by the algorithm.
+        """
+        t = pts @ c
+        s = np.abs(t) ** 2
+        s = np.clip(s, 0.0, 1.0)
+        return float(np.sum(1.0 - s))
+
+
+
     def _compute_objective_from_assign(self, X: np.ndarray, labels: np.ndarray) -> float:
         """Sum of distances to assigned centroids - uses cache if available."""
         if self._last_dmat is None or self._last_dmat.shape[0] != len(X):
@@ -292,13 +308,35 @@ class QuantumKMeans:
                 cluster_losses.append(self._cluster_log_fid_loss(pts, newC[k], self.smooth_eps))
 
             else:
-                # one_minus_fidelity: classical Mean + Normalizing
-                m = np.mean(pts, axis=0)
-                c_new = m / (np.linalg.norm(m) + eps_num)
-                newC[k] = c_new
-                cluster_losses.append(0.0)
-                backtracks.append(0)
-                grad_norms.append(0.0)
+                # one_minus_fidelity:
+                #
+                # Minimize sum_i (1 - |<u_i, c>|^2) under ||c|| = 1.
+                # This is equivalent to maximizing c^T Sigma c with
+                # Sigma = sum_i u_i u_i^T, so the optimizer is the leading
+                # eigenvector of Sigma, not the normalized arithmetic mean.
+
+                c_old = self.cluster_centers_[k]
+                Sigma = pts.T @ pts
+
+                # If Sigma is numerically zero, keep the old centroid.
+                if np.linalg.norm(Sigma, ord="fro") < eps_num:
+                    newC[k] = c_old
+                    cluster_losses.append(self._cluster_one_minus_fid_loss(pts, c_old))
+                    backtracks.append(0)
+                    grad_norms.append(0.0)
+                else:
+                    eigvals, eigvecs = np.linalg.eigh(Sigma)
+                    c_new = eigvecs[:, np.argmax(eigvals)]
+                    c_new = c_new / (np.linalg.norm(c_new) + eps_num)
+
+                    newC[k] = c_new
+                    cluster_losses.append(self._cluster_one_minus_fid_loss(pts, c_new))
+                    backtracks.append(0)
+
+                    # Optional diagnostic: projected gradient norm at the old centroid
+                    Sc = Sigma @ c_old
+                    proj = Sc - (np.vdot(c_old, Sc).real) * c_old
+                    grad_norms.append(float(2.0 * np.linalg.norm(proj)))
 
         stats = {
             "accept_count": accept_count,
