@@ -99,3 +99,6 @@ python classical_confusion.py --model_dir experiments/models/<your_model_dir>
 ## Citation
 
 If you use this repository or its results, please cite the accompanying paper or the machine-readable `CITATION.cff` file included in the repository.
+
+## Legacy
+This repository and paper are a development out of a bachelors thesis done at the Leibniz University Hannover by Christian Jesinghaus. The Repository to this thesis can be found under: https://github.com/ChristianJesinghaus/Hybrid-Quantum-Classical-Product-Quantization-for-Vector-Databases
