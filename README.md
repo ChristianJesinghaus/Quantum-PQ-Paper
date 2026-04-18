@@ -12,12 +12,6 @@ source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-After confirming a clean run in a fresh environment, save an exact lock file for the submission artifact:
-
-```bash
-pip freeze > requirements-lock.txt
-```
-
 ### 2) Generate the datasets used in the paper
 
 ```bash
