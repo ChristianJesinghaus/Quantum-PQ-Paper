@@ -1,4 +1,4 @@
-# Artifact for “Additive Log-Fidelity Quantum k-Means for Hybrid Product Quantization”
+# “Additive Log-Fidelity Quantum k-Means for Hybrid Product Quantization”
 
 This repository accompanies the short NIER submission on additive log-fidelity quantum k-means for hybrid product quantization. It reproduces the paper’s main experiments on Digits, downsampled Fashion-MNIST 8x8, and Signed-Mirror-64, and it contains the scripts used to generate the paper tables, plots, and summary reports.
 
